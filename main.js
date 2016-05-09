@@ -75,11 +75,34 @@ let findCharacter = function(characters, name){
 let secondRepo = Repository.create();
 let rollbackTime = Time.now();
 
-let newDiffs = Immutable.List();
+let receivedDiffs = Immutable.List();
 
 socket.onmessage = function(event){
-  newDiffs = Immutable.fromJS(JSON.parse(event.data));
-  rollbackTime = newDiffs.first().get('timestamp') - 0.001;
+  receivedDiffs = Immutable.fromJS(JSON.parse(event.data));
+  rollbackTime = receivedDiffs.first().get('timestamp') - 0.001;
+}
+
+
+function handleKeys(keys){
+  let newCommands = Immutable.List();
+
+  if (keys.get(87) != lastKeys.get(87)){
+    if (keys.get(87)){
+      newCommands = newCommands.push(Command.create('changeDirection', "Ronald", {direction: 'up'}));
+    } else {
+      newCommands = newCommands.push(Command.create('stopMoving', "Ronald", {}));
+    }
+  }
+
+  if (keys.get(83) != lastKeys.get(83)){
+    if (keys.get(83)){
+      newCommands = newCommands.push(Command.create('changeDirection', "Ronald", {direction: 'down'}));
+    } else {
+      newCommands = newCommands.push(Command.create('stopMoving', "Ronald", {}));
+    }
+  }
+
+  return newCommands;
 }
 
 
@@ -100,22 +123,7 @@ function renderLoop(){
   let dt = currentTime - lastTime;
 
 
-  if (keys.get(87) != lastKeys.get(87)){
-    if (keys.get(87)){
-      newCommands = newCommands.push(Command.create('changeDirection', "Ronald", {direction: 'up'}));
-    } else {
-      newCommands = newCommands.push(Command.create('stopMoving', "Ronald", {}));
-    }
-  }
-
-  if (keys.get(83) != lastKeys.get(83)){
-    if (keys.get(83)){
-      newCommands = newCommands.push(Command.create('changeDirection', "Ronald", {direction: 'down'}));
-    } else {
-      newCommands = newCommands.push(Command.create('stopMoving', "Ronald", {}));
-    }
-  }
-
+  newCommands = handleKeys(keys);
 
   let newDiffs = Immutable.List();
   newCommands.forEach(function(command){
@@ -134,12 +142,12 @@ function renderLoop(){
 
   let {index, character} = findCharacter(characters, "Oliver");
   let oliver = character;
-  if (newDiffs.size > 0){
+  if (receivedDiffs.size > 0){
     oliver = Repository.reverseTime(oliver, secondRepo, lastTime, rollbackTime);
-    newDiffs.forEach(function(diff){
+    receivedDiffs.forEach(function(diff){
       secondRepo = secondRepo.push(diff);
     });
-    newDiffs = Immutable.List();
+    receivedDiffs = Immutable.List();
     oliverTime = rollbackTime;
   }
   oliver = Repository.forwardTime(oliver, secondRepo, oliverTime, currentTime);
