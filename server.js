@@ -14,7 +14,9 @@ wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
     let diff = Immutable.fromJS(JSON.parse(message));
     repo = repo.push(diff);
-    ws.send(message);
+    setTimeout(function(){
+      ws.send(message);
+    }, 100);
   });
   ws.on('open', function(){
     ws.send(JSON.stringify(repo.toJS()));
