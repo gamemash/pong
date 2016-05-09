@@ -30,8 +30,6 @@ let gameLoop = function(dt){
 }
 
 let ronald = Character.create("Ronald");
-//console.log('position', ronald.get('position').toJS());
-//console.log('velocity', ronald.get('velocity').toJS());
 
 Time.timeOverwrite = 2;
 newCommands = newCommands.push(Command.create('changeDirection', {direction: 'left'}));
@@ -45,7 +43,7 @@ gameLoop(1);
 //console.log(ronald.get('velocity').toJS());
 ronald = Repository.reverseTime(ronald, repo, 0);
 Time.timeOverwrite = 0;
-//console.log("returned to zero:", ronald.get('position').equals(Vector.create()));
+console.log("returned to zero:", ronald.get('position').equals(Vector.create()));
 console.log('position', ronald.get('position').toJS());
 console.log('velocity', ronald.get('velocity').toJS());
 ronald = Repository.forwardTime(ronald, repo, 10);

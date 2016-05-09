@@ -1,17 +1,18 @@
 
 let Immutable = require('immutable');
+let Map = Immutable.Map;
 let List = Immutable.List;
-let Repository = List;
 let Time = require('./time.js');
 let Character = require('./character.js');
 
+
 module.exports = {
   create: function(){
-    return Repository();
+    return List();
   },
-  reverseTime: function(object, history, time){
+  reverseTime: function(object, repository, time){
     let currentTime = Time.now();
-    let localHistory = history;
+    let localHistory = repository;
     let dt;
     while(currentTime > time){
       let diff = localHistory.last();
@@ -29,10 +30,10 @@ module.exports = {
     }
     return object;
   },
-  forwardTime: function(object, history, time){
+  forwardTime: function(object, repository, time){
     let currentTime = Time.now();
     console.log('currentTime', currentTime);
-    let localHistory = history.filter(function(diff){
+    let localHistory = repository.filter(function(diff){
       return diff.get('timestamp') >= currentTime;
     });
 
