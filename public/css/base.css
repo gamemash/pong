@@ -17,7 +17,6 @@ h1 {
 
 #game-wrapper {
   width: 100%;
-  height: 200px;
   border-top: 1px solid #555;
   border-bottom: 1px solid #555;
   margin: 15px 0px;
@@ -26,18 +25,10 @@ h1 {
   text-align: center;
 }
 
-#game-wrapper .player{
-  width: 10px;
-  position: absolute;
-  height: 40px;
-  background-color: red;
-  top: 10px;
-  left: 10px;
-}
-
 #game-canvas {
   transition: opacity 0.2s;
   display: inline;
+  height: 400px;
 }
 
 #form {

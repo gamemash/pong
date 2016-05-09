@@ -17,7 +17,7 @@ wss.on('connection', function connection(ws) {
     ws.send(message);
   });
   ws.on('open', function(){
-    repo = Repository.create();
+    ws.send(JSON.stringify(repo.toJS()));
   });
   ws.on('close', function(){
     console.log('lost connection');

@@ -3,6 +3,7 @@ let socket = new WebSocket("ws://localhost:5000");
 let serverConnected = new Promise(function(resolve){
   socket.onopen = function(event){
     console.log("connected");
+    start();
     resolve();
   }
 });
@@ -70,6 +71,7 @@ let findCharacter = function(characters, name){
   
   return {index: entry[0], character: entry[1]};
 }
+
 let secondRepo = Repository.create();
 let rollbackTime = Time.now();
 
@@ -82,12 +84,16 @@ socket.onmessage = function(event){
 
 
 
+function start(){
+  renderLoop();
+}
 let repo = Repository.create();
 let position = 40;
 let lastTime = Time.now();
 let currentTime = Time.now();
 let lastKeys = keys;
 let oliverTime = Time.now();
+
 function renderLoop(){
   lastTime = currentTime;
   currentTime = Time.now();
@@ -149,7 +155,7 @@ function renderLoop(){
   context.clearRect(0, 0, canvas.width, canvas.height);
   characters.forEach(function(character){
     context.fillStyle = "red";
-    context.fillRect(character.getIn(['position','x']) ,-character.getIn(['position', 'y']), 10, 40);
+    context.fillRect(character.getIn(['position','x']) ,-character.getIn(['position', 'y']), 4, 10);
   });
 
   
@@ -160,5 +166,3 @@ function renderLoop(){
   requestAnimationFrame(renderLoop);
   lastKeys = keys;
 }
-
-renderLoop();

@@ -28,7 +28,7 @@ let commands = {
 
 };
 
-let speed = 100;
+let speed = 200;
 
 module.exports = {
   create: function(name){
