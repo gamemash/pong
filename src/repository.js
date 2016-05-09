@@ -32,6 +32,7 @@ module.exports = {
     return object;
   },
   forwardTime: function(object, repository, time){
+    console.log('object', object.toJS());
     let currentTime = Time.now();
     console.log('currentTime', currentTime);
     let localHistory = repository.filter(function(diff){

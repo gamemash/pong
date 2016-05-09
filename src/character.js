@@ -4,7 +4,7 @@ let Character = Map;
 let Vector = require('./vector.js');
 let Time = require('./time.js');
 
-let changeDirection = function(data, character){
+let changeDirection = function(character, data){
   switch(data.get('direction')){
     case 'left':
       return character.set('velocity', Vector.create(1, 0));
@@ -26,8 +26,8 @@ module.exports = {
       velocity: Vector.create()
     });
   },
-  applyCommand: function(command, character){
-    return commands[command.get('command')](command.get('data'), character);
+  applyCommand: function(character, command){
+    return commands[command.get('command')](character,command.get('data'));
   },
   update: function(character, dt){
     character = character.setIn(['position', 'x'],character.getIn(['position', 'x']) + character.getIn(['velocity', 'x']) * dt);
