@@ -1,4 +1,25 @@
 "use strict";
+let socket = new WebSocket("ws://localhost:5000");
+let serverConnected = new Promise(function(resolve){
+  socket.onopen = function(event){
+    console.log("connected");
+    resolve();
+  }
+});
+
+
+let sendToServer = function(data){
+  serverConnected.then(function(){
+    socket.send(data);
+  });
+}
+//var client = net.connect({port: 8000},
+//    function() { 
+//    console.log('client connected');
+//});
+//
+//client.on('error', console.error);
+
 
 let Immutable = require('immutable');
 let Command = require('./src/command.js');
@@ -25,9 +46,22 @@ document.addEventListener("keyup",handleKeyup,false);
 document.addEventListener("keydown",handleKeydown,false);
 
 
+//
+//console.log(socket);
+//let client = net.connect({port: 8124}, () => {
+//  // 'connect' listener
+//  console.log('connected to server!');
+//  client.write('world!\r\n');
+//});
+//
+
+
 let characters = Immutable.List([
   Character.create("Ronald"),
+  Character.create("Oliver")
 ]);
+
+characters = characters.setIn([1, 'position', 'x'], 100);
 
 let findCharacter = function(characters, name){
   let entry = characters.findEntry(function(character){
@@ -36,16 +70,28 @@ let findCharacter = function(characters, name){
   
   return {index: entry[0], character: entry[1]};
 }
+let secondRepo = Repository.create();
+let rollbackTime = Time.now();
+
+let newDiffs = Immutable.List();
+
+socket.onmessage = function(event){
+  newDiffs = Immutable.fromJS(JSON.parse(event.data));
+  rollbackTime = newDiffs.first().get('timestamp') - 0.001;
+}
+
 
 
 let repo = Repository.create();
-let chronoView = characters.get(0);
 let position = 40;
 let lastTime = Time.now();
+let currentTime = Time.now();
 let lastKeys = keys;
+let oliverTime = Time.now();
 function renderLoop(){
-  let nextLastTime = Time.now();
-  let dt = 1/60;
+  lastTime = currentTime;
+  currentTime = Time.now();
+  let dt = currentTime - lastTime;
 
 
   if (keys.get(87) != lastKeys.get(87)){
@@ -65,18 +111,40 @@ function renderLoop(){
   }
 
 
+  let newDiffs = Immutable.List();
   newCommands.forEach(function(command){
     let {index, character} = findCharacter(characters, command.get('object'));
     let after = Character.applyCommand(character,command);
-    repo = repo.push(Diff.generate(character, after));
+    let newDiff = Diff.generate(character, after);
+    newDiffs = newDiffs.push(newDiff);
+    repo = repo.push(newDiff);
     characters = characters.set(index, after);
   });
+
+
+  if (newCommands.size > 0){
+    sendToServer(JSON.stringify(newDiffs.toJS()));
+  }
+
+  let {index, character} = findCharacter(characters, "Oliver");
+  let oliver = character;
+  if (newDiffs.size > 0){
+    oliver = Repository.reverseTime(oliver, secondRepo, lastTime, rollbackTime);
+    newDiffs.forEach(function(diff){
+      secondRepo = secondRepo.push(diff);
+    });
+    newDiffs = Immutable.List();
+    oliverTime = rollbackTime;
+  }
+  oliver = Repository.forwardTime(oliver, secondRepo, oliverTime, currentTime);
+  oliverTime = currentTime;
 
   newCommands = Immutable.List();
 
   characters = characters.map(function(character){
     return Character.update(character, dt);
   });
+  characters = characters.set(index, oliver);
 
   context.clearRect(0, 0, canvas.width, canvas.height);
   characters.forEach(function(character){
@@ -85,13 +153,10 @@ function renderLoop(){
   });
 
   
-  chronoView = Repository.forwardTime(chronoView, repo, lastTime - 1, lastTime + dt - 1);
 
+  //context.fillStyle = "blue";
+  //context.fillRect(chronoView.getIn(['position','x']) + 100 ,-chronoView.getIn(['position', 'y']), 10, 40);
 
-  context.fillStyle = "blue";
-  context.fillRect(chronoView.getIn(['position','x']) + 100 ,-chronoView.getIn(['position', 'y']), 10, 40);
-
-  lastTime = nextLastTime;
   requestAnimationFrame(renderLoop);
   lastKeys = keys;
 }
