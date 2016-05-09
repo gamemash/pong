@@ -8,6 +8,7 @@ let Command = require('./src/command.js');
 let Character = require('./src/character.js');
 let Time = require('./src/time.js');
 let Repository = require('./src/repository.js');
+let Diff = require('./src/diff.js');
 
 let timeOverwrite = 0;
 Date.now = function() { return new Date().getTime(); }
@@ -30,22 +31,30 @@ let gameLoop = function(dt){
 }
 
 let ronald = Character.create("Ronald");
-
+let before = ronald;
 Time.timeOverwrite = 2;
 newCommands = newCommands.push(Command.create('changeDirection', {direction: 'left'}));
 gameLoop(1);
-//console.log(ronald.get('velocity').toJS());
-gameLoop(1);
-gameLoop(1);
-gameLoop(1);
-newCommands = newCommands.push(Command.create('changeDirection', {direction: 'right'}));
-gameLoop(1);
-//console.log(ronald.get('velocity').toJS());
-ronald = Repository.reverseTime(ronald, repo, 0);
-Time.timeOverwrite = 0;
-console.log("returned to zero:", ronald.get('position').equals(Vector.create()));
-console.log('position', ronald.get('position').toJS());
-console.log('velocity', ronald.get('velocity').toJS());
-ronald = Repository.forwardTime(ronald, repo, 10);
-console.log('position', ronald.get('position').toJS());
-console.log('velocity', ronald.get('velocity').toJS());
+let after = ronald
+let diff = Diff.generate(before, after);
+let reapplied = Diff.apply(before, diff.get('diff'));
+console.log('diff', diff.toJS());
+console.log('reapplied', reapplied.toJS());
+//console.log('position', ronald.get('position').toJS());
+//console.log('velocity', ronald.get('velocity').toJS());
+
+////console.log(ronald.get('velocity').toJS());
+//gameLoop(1);
+//gameLoop(1);
+//gameLoop(1);
+//newCommands = newCommands.push(Command.create('changeDirection', {direction: 'right'}));
+//gameLoop(1);
+////console.log(ronald.get('velocity').toJS());
+//ronald = Repository.reverseTime(ronald, repo, 0);
+//Time.timeOverwrite = 0;
+//console.log("returned to zero:", ronald.get('position').equals(Vector.create()));
+//console.log('position', ronald.get('position').toJS());
+//console.log('velocity', ronald.get('velocity').toJS());
+//ronald = Repository.forwardTime(ronald, repo, 10);
+//console.log('position', ronald.get('position').toJS());
+//console.log('velocity', ronald.get('velocity').toJS());
