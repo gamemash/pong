@@ -29,7 +29,7 @@ let apply = function(object, diff){
     if (Map.isMap(value)){
       object = object.set(key, apply(object.get(key), value));
     } else if (typeof value === 'string'){
-      object = object.set(key, object.get(key) - value);
+      //object = object.set(key, object.get(key) - value);
     } else {
       object = object.set(key, object.get(key) - value);
     }
