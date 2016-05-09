@@ -26,28 +26,8 @@ module.exports = {
       velocity: Vector.create()
     });
   },
-  generateDiff: function(before, after){
-    console.log(Time.now());
-    return Character({
-      timestamp: Time.now(),
-      diff: Map({
-        velocity: Vector.subtract(after.get('velocity'), before.get('velocity')),
-        position: Vector.subtract(after.get('position'), before.get('position'))
-      })
-    });
-  },
   applyCommand: function(command, character){
     return commands[command.get('command')](command.get('data'), character);
-  },
-  applyDiffdown: function(character, data){
-    let diff = data.get('diff');
-    return character.set('velocity', Vector.add(character.get('velocity'), diff.get('velocity')))
-    .set('position', Vector.add(character.get('position'), diff.get('position')));
-  },
-  applyDiffup: function(character, data){
-    let diff = data.get('diff');
-    return character.set('velocity', Vector.add(character.get('velocity'), diff.get('velocity')))
-    .set('position', Vector.add(character.get('position'), diff.get('position')));
   },
   update: function(character, dt){
     character = character.setIn(['position', 'x'],character.getIn(['position', 'x']) + character.getIn(['velocity', 'x']) * dt);

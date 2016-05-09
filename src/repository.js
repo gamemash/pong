@@ -4,6 +4,7 @@ let Map = Immutable.Map;
 let List = Immutable.List;
 let Time = require('./time.js');
 let Character = require('./character.js');
+let Diff = require('./diff.js');
 
 
 module.exports = {
@@ -19,7 +20,7 @@ module.exports = {
       if (diff && diff.get('timestamp') > time){
         dt = diff.get('timestamp') - currentTime;
         object = Character.update(object, dt);
-        object = Character.applyDiffdown(object, diff);
+        object = Diff.apply(object, diff.get('diff'));
         console.log(diff.toJS());
         localHistory = localHistory.pop();
       } else {
@@ -47,7 +48,7 @@ module.exports = {
         dt = diff.get('timestamp') - currentTime;
         console.log('dt', dt);
         object = Character.update(object, dt);
-        object = Character.applyDiffup(object, diff);
+        object = Diff.apply(object, diff.get('diff'));
         localHistory = localHistory.shift();
       } else {
         dt = time - currentTime;
