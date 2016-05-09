@@ -1,7 +1,6 @@
 "use strict";
 
 let Immutable = require('immutable');
-let Map = Immutable.Map;
 let List = Immutable.List;
 let Vector = require('./src/vector.js');
 let Command = require('./src/command.js');
