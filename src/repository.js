@@ -11,48 +11,43 @@ module.exports = {
   create: function(){
     return List();
   },
-  reverseTime: function(object, repository, time){
-    let currentTime = Time.now();
+  reverseTime: function(object, repository, fromTime, toTime){
+    let currentTime = fromTime;
     let localHistory = repository;
     let dt;
-    while(currentTime > time){
+    while(currentTime > toTime){
       let diff = localHistory.last();
-      if (diff && diff.get('timestamp') > time){
+      if (diff && diff.get('timestamp') > toTime){
         dt = diff.get('timestamp') - currentTime;
         object = Character.update(object, dt);
-        object = Diff.apply(object, diff.get('diff'));
-        console.log(diff.toJS());
+        object = Diff.applyDown(object, diff.get('diff'));
         localHistory = localHistory.pop();
       } else {
-        dt = time - currentTime;
+        dt = toTime - currentTime;
         object = Character.update(object, dt);
       }
       currentTime += dt;
     }
     return object;
   },
-  forwardTime: function(object, repository, time){
-    console.log('object', object.toJS());
-    let currentTime = Time.now();
-    console.log('currentTime', currentTime);
+  forwardTime: function(object, repository, fromTime, toTime){
+    let currentTime = fromTime;
     let localHistory = repository.filter(function(diff){
       return diff.get('timestamp') >= currentTime;
     });
 
     let dt;
 
-    while(currentTime < time){
+    while(currentTime < toTime){
       let diff = localHistory.first();
 
-      if (diff && diff.get('timestamp') < time){
-        console.log('diff timestamp', diff.get('timestamp'), diff.toJS());
+      if (diff && diff.get('timestamp') < toTime){
         dt = diff.get('timestamp') - currentTime;
-        console.log('dt', dt);
         object = Character.update(object, dt);
-        object = Diff.apply(object, diff.get('diff'));
+        object = Diff.applyUp(object, diff.get('diff'));
         localHistory = localHistory.shift();
       } else {
-        dt = time - currentTime;
+        dt = toTime - currentTime;
         object = Character.update(object, dt);
       }
       currentTime += dt;

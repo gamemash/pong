@@ -23,11 +23,11 @@ let diff = function(before, after){
   });
 }
 
-let apply = function(object, diff){
+let applyDown = function(object, diff){
   
   diff.forEach(function(value, key){
     if (Map.isMap(value)){
-      object = object.set(key, apply(object.get(key), value));
+      object = object.set(key, applyDown(object.get(key), value));
     } else if (typeof value === 'string'){
       //object = object.set(key, object.get(key) - value);
     } else {
@@ -37,11 +37,28 @@ let apply = function(object, diff){
   });
   return object;
 }
+
+let applyUp = function(object, diff){
+  
+  diff.forEach(function(value, key){
+    if (Map.isMap(value)){
+      object = object.set(key, applyUp(object.get(key), value));
+    } else if (typeof value === 'string'){
+      //object = object.set(key, object.get(key) - value);
+    } else {
+      object = object.set(key, object.get(key) + value);
+    }
+
+  });
+  return object;
+}
+
 module.exports = {
   generate: function(before, after){
     let timestamp = Time.now();
     return create(timestamp, diff(before, after));
   },
-  apply: apply
+  applyUp: applyUp,
+  applyDown: applyDown
 
 };
