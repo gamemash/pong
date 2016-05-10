@@ -16,7 +16,7 @@ wss.on('connection', function connection(ws) {
     repo = repo.push(diff);
     setTimeout(function(){
       ws.send(message);
-    }, 100);
+    }, 200);
   });
   ws.on('open', function(){
     ws.send(JSON.stringify(repo.toJS()));
