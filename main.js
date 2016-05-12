@@ -7,6 +7,7 @@ let ShaderLoader = require('./src/rendering/shader_loader.js');
 let Player = require('./src/player.js');
 let KeyBindings = require('./src/keybindings.js');
 let Time = require('./src/time.js');
+let Ball = require('./src/ball.js');
 
 let canvas = document.getElementById('game-canvas');
 
@@ -17,11 +18,14 @@ Promise.all([
   setup();
 });
 
+let ball = Ball.create();
+
 let players = Map({
   "Ronald": Player.create("Ronald"),
   "Oliver": Player.create("Oliver", Map({up: 73, down: 75}))
 });
 
+players = players.set("Ronald", Player.setPosition(players.get("Ronald"), 1));
 players = players.set("Oliver", Player.setPosition(players.get("Oliver"), 2));
 
 function setup(){
@@ -58,11 +62,14 @@ function displayLoop(){
   }
   
   players = players.map(function(player)  {return Player.update(player, dt) } );
+  ball = Ball.update(ball, dt);
 
   Renderer.clear();
   players.forEach(function(player, id){
     Tile.display(player.get('properties'));
   });
+
+  Tile.display(ball.get('properties'));
 
   KeyBindings.resetActions();
   requestAnimationFrame(displayLoop);

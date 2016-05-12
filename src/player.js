@@ -10,7 +10,9 @@ let defaultKeyBindings = Immutable.Map({
 let defaultProperties = Immutable.Map({
   position: Vector.create(10, 10),
   velocity: Vector.create(0, 0),
-  speed: 40
+  speed: 40,
+  size: Vector.create(1,4)
+
 });
 
 

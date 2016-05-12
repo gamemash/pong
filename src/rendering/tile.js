@@ -11,8 +11,9 @@ let Tile = {
   },
   display: function(data){
     let position = data.get('position').toArray();
+    let size = data.get('size').toArray();
 
-    Tile.render(position, [1, 4]);
+    Tile.render(position, size);
   },
   render: function(position, blockAspects){
     let gl = Renderer.gl;
