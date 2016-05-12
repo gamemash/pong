@@ -6,6 +6,7 @@ let Tile = require('./src/rendering/tile.js');
 let ShaderLoader = require('./src/rendering/shader_loader.js');
 let Player = require('./src/player.js');
 let KeyBindings = require('./src/keybindings.js');
+let Time = require('./src/time.js');
 
 let canvas = document.getElementById('game-canvas');
 
@@ -24,16 +25,26 @@ function setup(){
   Renderer.setupRenderer(canvas, 768, 512);
 
   Tile.setup();
-  displayLoop();
+  lastTime = Time.now();
+  currentTime = Time.now();
+
   KeyBindings.setupListeners();
 
   for (let player of players){
     KeyBindings.register(player.get('keybindings'));
   }
+
+  displayLoop();
 }
 
+let lastTime;
+let currentTime;
+
 function displayLoop(){
-  let dt = 1/60;
+  lastTime = currentTime;
+  currentTime = Time.now();
+  let dt = currentTime - lastTime;
+
   let keyActions = KeyBindings.getActions();
   if (keyActions.size > 0){
     keyActions.forEach(function(action){
