@@ -170,7 +170,7 @@ function renderLoop(){
   let direct = characters.get(2);
   let difference = direct.getIn(['position','y']) - historic.getIn(['position', 'y']);
   if (Math.abs(difference) > 0){
-    let factor = -difference * 8;
+    let factor = -Math.abs(difference) / difference * (1 - Math.exp(-Math.abs(difference))) * 50;
     let velocity = direct.getIn(['velocity', 'y']);
     let correction = factor * dt;
     direct = direct.setIn(['position', 'y'], direct.getIn(['position','y']) + correction);
