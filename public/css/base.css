@@ -28,7 +28,6 @@ h1 {
 #game-canvas {
   transition: opacity 0.2s;
   display: inline;
-  height: 400px;
 }
 
 #form {

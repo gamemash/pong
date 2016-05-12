@@ -17,6 +17,12 @@ module.exports = {
       x: vector_b.get('x') + vector_a.get('x'),
       y: vector_b.get('y') + vector_a.get('y')
     });
+  },
+  addScalar: function(vector_a, scalar){
+    return vector_a.set('x', vector_a.get('x') * scalar).set('y', vector_a.get('y') * scalar);
+  },
+  addScaledVector: function(vector_a, vector_b, scalar){
+    return this.add(vector_a, this.addScalar(vector_b, scalar));
   }
 }
 
