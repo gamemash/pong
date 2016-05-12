@@ -1,5 +1,5 @@
 "use strict";
-let Immutable = require('Immutable');
+let {Map} = require('Immutable');
 
 let Renderer = require('./src/renderer.js');
 let Tile = require('./src/rendering/tile.js');
@@ -17,9 +17,12 @@ Promise.all([
   setup();
 });
 
-let players = Immutable.List([
-  Player.create("Ronald")
-  ]);
+let players = Map({
+  "Ronald": Player.create("Ronald"),
+  "Oliver": Player.create("Oliver", Map({up: 73, down: 75}))
+});
+
+players = players.set("Oliver", Player.setPosition(players.get("Oliver"), 2));
 
 function setup(){
   Renderer.setupRenderer(canvas, 768, 512);
@@ -30,9 +33,9 @@ function setup(){
 
   KeyBindings.setupListeners();
 
-  for (let player of players){
-    KeyBindings.register(player.get('keybindings'));
-  }
+  players.forEach(function(player, id){
+    KeyBindings.register(player.get('keybindings'), id);
+  })
 
   displayLoop();
 }
@@ -48,17 +51,18 @@ function displayLoop(){
   let keyActions = KeyBindings.getActions();
   if (keyActions.size > 0){
     keyActions.forEach(function(action){
-      let player = players.get(0);
-      players = players.set(0, Player.handleAction(player, action));
+      let id = action.get('subject')
+      let player = players.get(id);
+      players = players.set(id, Player.handleAction(player, action));
     });
   }
   
   players = players.map(function(player)  {return Player.update(player, dt) } );
 
   Renderer.clear();
-  for(let player of players){
+  players.forEach(function(player, id){
     Tile.display(player.get('properties'));
-  }
+  });
 
   KeyBindings.resetActions();
   requestAnimationFrame(displayLoop);

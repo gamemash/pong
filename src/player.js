@@ -13,13 +13,18 @@ let defaultProperties = Immutable.Map({
   speed: 40
 });
 
+
 module.exports = {
   create: function(name, keyBindings, properties){
     return Immutable.Map({
       name: name,
-      keybindings: (keyBindings ? keyBindings : defaultKeyBindings),
-      properties: (properties ? properties : defaultProperties)
+      keybindings: (keyBindings ? defaultKeyBindings.merge(keyBindings) : defaultKeyBindings),
+      properties: (properties ? defaultKeyBindings.merge(properties) : defaultProperties)
     });
+  },
+  setPosition: function(player, position){
+    let playerPositions = [,10,86,14, 82];
+    return player.setIn(['properties', 'position', 'x'], playerPositions[position]);
   },
   handleAction: function(player, actionInfo){
     let action = actionInfo.get('action');

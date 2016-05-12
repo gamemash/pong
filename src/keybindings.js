@@ -4,8 +4,8 @@ let {Map, List} = require('Immutable');
 let registers = Map();
 let actions = List();
 
-let createAction = function(action, e){
-  return Map({action: action, event: e});
+let createAction = function(action, subject){
+  return Map({action: action, subject: subject});
 }
 
 let registerBinding = function(registers, keyCode, action){
@@ -19,7 +19,9 @@ let registerBinding = function(registers, keyCode, action){
 let keyEvent = function(e){
   if (e.repeat) return;
   if (!registers.has(e.keyCode)) return;
-  actions = actions.merge(registers.get(e.keyCode).map(function(action) { return createAction(action, e) }));
+  registers.get(e.keyCode).forEach(function(action) {
+    actions = actions.push(action.set('event', e)); 
+  });
 }
 
 module.exports = {
@@ -27,12 +29,10 @@ module.exports = {
     document.addEventListener("keydown", keyEvent, false);
     document.addEventListener("keyup", keyEvent, false);
   },
-  register: function(bindings){
+  register: function(bindings, subject){
     bindings.forEach(function(keyCode, action){
-      registers = registerBinding(registers, keyCode, action);
+      registers = registerBinding(registers, keyCode, createAction(action, subject));
     });
-
-    console.log(registers.toJS());
   },
   getActions: function(){
     return actions;
