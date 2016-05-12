@@ -41,7 +41,6 @@ function displayLoop(){
       players = players.set(0, Player.handleAction(player, action));
     });
   }
-  //let keyActions = handleKeys();
   
   players = players.map(function(player)  {return Player.update(player, dt) } );
 

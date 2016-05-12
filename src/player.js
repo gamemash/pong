@@ -21,13 +21,18 @@ module.exports = {
       properties: (properties ? properties : defaultProperties)
     });
   },
-  handleAction: function(player, action){
-    console.log(action);
-    switch(action){
-      case 'up':
-        return player.setIn(['properties','velocity'], Vector.create(0, 1));
-      case 'down':
-        return player.setIn(['properties','velocity'], Vector.create(0,-1));
+  handleAction: function(player, actionInfo){
+    let action = actionInfo.get('action');
+    let event = actionInfo.get('event');
+    if(event.type == "keydown"){
+      switch(action){
+        case 'up':
+          return player.setIn(['properties','velocity'], Vector.create(0, 1));
+        case 'down':
+          return player.setIn(['properties','velocity'], Vector.create(0,-1));
+      }
+    } else {
+      return player.setIn(['properties','velocity'], Vector.create(0,0));
     }
   },
   update: function(player, dt){
