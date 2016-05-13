@@ -31,12 +31,7 @@ module.exports = {
           ball = ball.setIn(['properties', 'position', 'x'], player.getIn(['properties', 'position', 'x']) + player.getIn(['properties', 'size', 'x']));
         }
 
-        ball = ball.setIn(['properties', 'velocity'], 
-          Vector.add(
-            ball.getIn(['properties', 'velocity']),
-            Vector.addScalar(result,2)
-          )
-        );
+        ball = ball.setIn(['properties', 'velocity'], result);
       }
     });
     return ball;
