@@ -8,8 +8,8 @@ module.exports = {
       name: "Ball",
       properties: Map({
         position: Vector.create(48,32),
-        velocity: Vector.create(-0.5, -1),
-        size: Vector.create(2,2),
+        velocity: Vector.create(-1.0, 0),
+        size: Vector.create(1,1),
         speed: 40
       })
     });
@@ -18,6 +18,12 @@ module.exports = {
     players.forEach(function(player){
       if(Collisions.detect(ball, player)){
         let result = Vector.multiplyVector(Vector.create(-1, 0), ball.getIn(['properties','velocity']));
+        let distanceFromCenter = (player.getIn(['properties','position','y']) + player.getIn(['properties','size','y']) / 2) - (ball.getIn(['properties','position','y']) + ball.getIn(['properties','size','y']) / 2);
+        let angle = 0;
+        if (Math.abs(distanceFromCenter) > player.getIn(['properties','size','y']) / 4){
+          angle = Math.atan( -distanceFromCenter / player.getIn(['properties','size','y']));
+        }
+        result = Vector.rotateVector(result, angle);
 
         if (ball.getIn(['properties', 'velocity', 'x']) > 0) {
           ball = ball.setIn(['properties', 'position', 'x'], player.getIn(['properties', 'position', 'x']) - ball.getIn(['properties', 'size', 'x']));

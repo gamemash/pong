@@ -29,6 +29,12 @@ module.exports = {
       vector_b.get('x') * vector_a.get('x'),
       vector_b.get('y') * vector_a.get('y')
     );
+  },
+  rotateVector: function(vector_a, angle){
+    return this.create(
+      vector_a.get('x') * Math.cos(angle) - vector_a.get('y') * Math.sin(angle),
+      vector_a.get('x') * Math.sin(angle) + vector_a.get('y') * Math.cos(angle)
+    );
   }
 
 
