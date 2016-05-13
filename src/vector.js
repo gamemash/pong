@@ -23,6 +23,14 @@ module.exports = {
   },
   addScaledVector: function(vector_a, vector_b, scalar){
     return this.add(vector_a, this.addScalar(vector_b, scalar));
+  },
+  multiplyVector: function(vector_a, vector_b){
+    return this.create(
+      vector_b.get('x') * vector_a.get('x'),
+      vector_b.get('y') * vector_a.get('y')
+    );
   }
+
+
 }
 

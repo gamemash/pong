@@ -1,6 +1,8 @@
 
 module.exports = {
-  setupRenderer: function(canvas, width, height){
+  setupRenderer: function(canvas, aspects){
+    let width = aspects[0];
+    let height = aspects[1];
     let gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
 
     gl.clearColor(0.1, 0.1, 0.1, 1);
