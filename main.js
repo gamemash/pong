@@ -48,6 +48,15 @@ function setup(){
 let lastTime;
 let currentTime;
 
+function checkLoseCondition(ball, players, gameAspects){
+  if (ball.getIn(['properties', 'position', 'x']) < 0 || ball.getIn(['properties', 'position', 'x']) > gameAspects.get('x')){
+    console.log("lost");
+    ball = Ball.create();
+  }
+  return ball;
+
+}
+
 function displayLoop(){
   lastTime = currentTime;
   currentTime = Time.now();
@@ -66,6 +75,7 @@ function displayLoop(){
   ball = Ball.update(ball, players, dt);
   ball = Ball.checkCollisionsWithPlayers(ball, players);
   ball = Ball.checkCollisionsWithWalls(ball, gameAspects);
+  ball = checkLoseCondition(ball, players, gameAspects);
 
   Renderer.clear();
   players.forEach(function(player, id){
