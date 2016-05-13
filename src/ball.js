@@ -23,11 +23,12 @@ module.exports = {
         if (Math.abs(distanceFromCenter) > player.getIn(['properties','size','y']) / 4){
           angle = Math.atan( -distanceFromCenter / player.getIn(['properties','size','y']));
         }
-        result = Vector.rotateVector(result, angle);
 
         if (ball.getIn(['properties', 'velocity', 'x']) > 0) {
+          result = Vector.rotateVector(result, -angle);
           ball = ball.setIn(['properties', 'position', 'x'], player.getIn(['properties', 'position', 'x']) - ball.getIn(['properties', 'size', 'x']));
         } else {
+          result = Vector.rotateVector(result, angle);
           ball = ball.setIn(['properties', 'position', 'x'], player.getIn(['properties', 'position', 'x']) + player.getIn(['properties', 'size', 'x']));
         }
 
