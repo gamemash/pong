@@ -17,11 +17,15 @@ function getConnectionID(ws){
 }
 
 function newGame(playerId){
-  let players = {};
-  players[playerId] = Player.create(playerId);
   return Map({
-    players: Immutable.fromJS(players)
+    players: newPlayer(Map(), playerId)
   });
+}
+
+function newPlayer(players, playerId){
+  let player = Player.create(playerId);
+  player = Player.setPosition(player, players.size + 1);
+  return players.set(playerId, player);
 }
 
 let responses = {
@@ -42,7 +46,7 @@ let commands = {
   connectToGame: function(id, data){
     let gameId = data.gameId;
     if (games.has(gameId)){
-      games = games.setIn([gameId, 'players', id], Player.create(id));
+      games = games.setIn([gameId, 'players'], newPlayer(games.getIn([gameId, 'players']),id));
     } else {
       games = games.set(gameId, newGame(id));
     }

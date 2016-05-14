@@ -44,9 +44,8 @@ function setup(){
   KeyBindings.setupListeners();
   Server.connectToGame("a-gameid").then(function(data){
     players = Immutable.fromJS(data.game.players);
+    console.log(data);
 
-    console.log(playerId);
-    console.log(players.toJS());
     KeyBindings.register(players.getIn([playerId, 'keybindings']), playerId);
   });
   //"Ronald": Player.create("Ronald"),
