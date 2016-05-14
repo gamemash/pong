@@ -24,6 +24,23 @@ h1 {
   background-color: black;
   text-align: center;
 }
+#game-wrapper #no-server-connection {
+  display: block;
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  width: 50%;
+  height: 200px;
+  margin-left: -25%;
+  background-color: #c74b0c;
+  text-align: center;
+  border: 1px solid #af5b41;
+  border-radius: 10px;
+  color: #ccc;
+  font-size: 30px;
+  top: 43%;
+  display: none;
+}
 
 #game-canvas {
   transition: opacity 0.2s;

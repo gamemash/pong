@@ -1,5 +1,6 @@
 "use strict";
-let {Map} = require('Immutable');
+let Immutable = require('Immutable');
+let Map = Immutable.Map;
 
 let Renderer = require('./src/renderer.js');
 let Tile = require('./src/rendering/tile.js');
@@ -9,25 +10,29 @@ let KeyBindings = require('./src/keybindings.js');
 let Time = require('./src/time.js');
 let Ball = require('./src/ball.js');
 let Vector = require('./src/vector.js');
+let Server = require('./src/server.js');
 
 let canvas = document.getElementById('game-canvas');
+let errorHandler = function(){
+  console.log("something went wrong");
+  document.getElementById('no-server-connection').style.display = "block";
+}
+
+let playerId;
 
 Promise.all([
   ShaderLoader.load('tile.vert'),
-  ShaderLoader.load('tile.frag')
+  ShaderLoader.load('tile.frag'),
+  Server.connect("ws://localhost:5000")
 ]).then(function(){
+  playerId = Server.playerId;
   setup();
-});
+}, errorHandler);
 
 let ball = Ball.create();
 let gameAspects = Vector.create(96, 64);
-let players = Map({
-  "Ronald": Player.create("Ronald"),
-  "Oliver": Player.create("Oliver", Map({up: 73, down: 75}))
-});
+let players = Map({ });
 
-players = players.set("Ronald", Player.setPosition(players.get("Ronald"), 1));
-players = players.set("Oliver", Player.setPosition(players.get("Oliver"), 2));
 
 function setup(){
   Renderer.setupRenderer(canvas, Vector.addScalar(gameAspects, 8).toArray());
@@ -37,26 +42,33 @@ function setup(){
   currentTime = Time.now();
 
   KeyBindings.setupListeners();
+  Server.connectToGame("a-gameid").then(function(data){
+    players = Immutable.fromJS(data.game.players);
 
-  players.forEach(function(player, id){
-    KeyBindings.register(player.get('keybindings'), id);
-  })
+    console.log(playerId);
+    console.log(players.toJS());
+    KeyBindings.register(players.getIn([playerId, 'keybindings']), playerId);
+  });
+  //"Ronald": Player.create("Ronald"),
+  //"Oliver": Player.create("Oliver", Map({up: 73, down: 75}))
+  //players = players.set("Ronald", Player.setPosition(players.get("Ronald"), 1));
+  //players = players.set("Oliver", Player.setPosition(players.get("Oliver"), 2));
+
 
   displayLoop();
 }
 
-let lastTime;
-let currentTime;
 
 function checkLoseCondition(ball, players, gameAspects){
   if (ball.getIn(['properties', 'position', 'x']) < 0 || ball.getIn(['properties', 'position', 'x']) > gameAspects.get('x')){
-    console.log("lost");
     ball = Ball.create();
   }
   return ball;
 
 }
 
+let lastTime;
+let currentTime;
 function displayLoop(){
   lastTime = currentTime;
   currentTime = Time.now();
