@@ -1,12 +1,17 @@
 let Immutable = require('Immutable');
 let Map = Immutable.Map;
 let List = Immutable.List;
+let Player = require('./player.js');
 
 let socket;
 let openPromises = Map({
   connectToGame: List(),
 
 });
+
+let sendMessage = function(message){
+  socket.send(JSON.stringify(message));
+}
 
 let accumulatedMessages = List();
 
@@ -20,8 +25,11 @@ let fulfillPromise = function(promises, property, data){
 
 let commands = {
   connectToGame: function(gameId){
-    return {command: "connectToGame", data: { gameId: gameId}}
+    return {command: "connectToGame", data: { gameId: gameId}};
   },
+  sendActions: function(actions){
+    return {command: "sendActions", data: { actions: actions }};
+  }
 };
 
 let responses = {
@@ -53,18 +61,32 @@ let Server = {
       openPromises = openPromises.setIn(['connect', -1], resolve);
     });
   },
+  sendActions: function(actions){
+    sendMessage(commands.sendActions(actions));
+  },
   connectToGame: function(gameid){
     return new Promise(function(resolve, error){
       openPromises = openPromises.setIn(['connectToGame', -1], resolve);
-      socket.send(JSON.stringify(commands.connectToGame(gameid)));
+      sendMessage(commands.connectToGame(gameid));
     });
   },
   handleNewMessages: function(players, ball){
     accumulatedMessages.forEach(function(message){
-      console.log(message);
       switch(message.response){
         case 'newPlayer':
           players = players.set(message.data.player.name, Immutable.fromJS(message.data.player));
+          break;
+        case 'newActions':
+          message.data.actions.forEach(function(action){
+            let act = Immutable.fromJS(action);
+            let player = players.find(function(player){
+              return player.get('name') == action.subject;
+            });
+            players = players.set(action.subject, Player.handleAction(player, act));
+          });
+          break;
+        default:
+          console.log('Unhandled message', message.response);
           break;
       }
     });

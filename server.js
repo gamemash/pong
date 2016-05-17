@@ -37,8 +37,17 @@ let responses = {
   },
   connectedToGame: function(playerId, gameId){
     return {response: 'connectedToGame', data: { game: games.get(gameId).toJS() }};
+  },
+  newActions: function(actions){
+    return {response: 'newActions', data: { actions: actions }}
   }
   
+}
+
+let findByPlayerId = function(id){
+  return function(player){
+    return player.get('name') == id;
+  }
 }
 
 let commands = {
@@ -62,7 +71,18 @@ let commands = {
       games = games.set(gameId, newGame(id));
     }
     return responses.connectedToGame(id, gameId);
+  },
+  sendActions: function(id, data){
+    let game = games.find(function(game) {
+      return game.get('players').find(findByPlayerId(id));
+    });
+    let otherPlayers = game.get('players').filterNot(findByPlayerId(id));
+    let message = responses.newActions(data.actions);
+    otherPlayers.forEach(function(player){
+      notifyClient(player.get('name'), message);
+    });
   }
+
 }
 
 function handleMessage(ws, id, message){

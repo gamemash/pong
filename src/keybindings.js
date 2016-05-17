@@ -20,7 +20,7 @@ let keyEvent = function(e){
   if (e.repeat) return;
   if (!registers.has(e.keyCode)) return;
   registers.get(e.keyCode).forEach(function(action) {
-    actions = actions.push(action.set('event', e)); 
+    actions = actions.push(action.set('type', e.type)); 
   });
 }
 

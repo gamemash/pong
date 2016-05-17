@@ -30,8 +30,7 @@ module.exports = {
   },
   handleAction: function(player, actionInfo){
     let action = actionInfo.get('action');
-    let event = actionInfo.get('event');
-    if(event.type == "keydown"){
+    if(actionInfo.get('type') == "keydown"){
       switch(action){
         case 'up':
           return player.setIn(['properties','velocity'], Vector.create(0, 1));

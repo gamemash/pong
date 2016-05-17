@@ -75,6 +75,7 @@ function displayLoop(){
 
   let keyActions = KeyBindings.getActions();
   if (keyActions.size > 0){
+    Server.sendActions(keyActions.toJS());
     keyActions.forEach(function(action){
       let id = action.get('subject')
       let player = players.get(id);
