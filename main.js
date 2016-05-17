@@ -81,6 +81,11 @@ function displayLoop(){
       players = players.set(id, Player.handleAction(player, action));
     });
   }
+
+
+  let updated = Server.handleNewMessages(players, ball);
+  players = updated.players;
+  ball = updated.ball;
   
   players = players.map(function(player)  {return Player.update(player, dt) } );
   ball = Ball.update(ball, players, dt);

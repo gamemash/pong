@@ -29,6 +29,9 @@ function newPlayer(players, playerId){
 }
 
 let responses = {
+  newPlayer: function(player){
+    return {response: 'newPlayer', data: { player: player }}
+  },
   connected: function(id){
     return {response: 'connected', data: { playerId: id } };
   },
@@ -46,11 +49,18 @@ let commands = {
   connectToGame: function(id, data){
     let gameId = data.gameId;
     if (games.has(gameId)){
+      let existingPlayers = games.getIn([gameId, 'players']);
       games = games.setIn([gameId, 'players'], newPlayer(games.getIn([gameId, 'players']),id));
+
+      if (games.get(gameId).size > 0){
+        let addedPlayer = games.getIn([gameId, 'players']).last();
+        existingPlayers.forEach(function(player){
+          notifyClient(player.get('name'), responses.newPlayer(addedPlayer));
+        });
+      }
     } else {
       games = games.set(gameId, newGame(id));
     }
-    console.log("connected", id, "to game", gameId, " - ", games.get(gameId));
     return responses.connectedToGame(id, gameId);
   }
 }
@@ -59,6 +69,12 @@ function handleMessage(ws, id, message){
   let response = commands[message.command](id, message.data);
   if (response){
     ws.send(JSON.stringify(response));
+  }
+}
+
+function notifyClient(id, message){
+  if (connections.has(id)){
+    connections.get(id).send(JSON.stringify(message));
   }
 }
 

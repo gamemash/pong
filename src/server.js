@@ -1,10 +1,14 @@
-let {Map, List} = require('Immutable');
+let Immutable = require('Immutable');
+let Map = Immutable.Map;
+let List = Immutable.List;
 
 let socket;
 let openPromises = Map({
   connectToGame: List(),
 
 });
+
+let accumulatedMessages = List();
 
 let fulfillPromise = function(promises, property, data){
   promises.get(property).forEach(function(resolve){
@@ -33,7 +37,11 @@ let responses = {
 
 let handleMessage = function incoming(message){
   let data = JSON.parse(message.data);
-  responses[data.response](data.data);
+  if (responses[data.response]){
+    responses[data.response](data.data);
+  } else {
+    accumulatedMessages = accumulatedMessages.push(data);
+  }
 }
 
 let Server = {
@@ -50,6 +58,24 @@ let Server = {
       openPromises = openPromises.setIn(['connectToGame', -1], resolve);
       socket.send(JSON.stringify(commands.connectToGame(gameid)));
     });
+  },
+  handleNewMessages: function(players, ball){
+    accumulatedMessages.forEach(function(message){
+      console.log(message);
+      switch(message.response){
+        case 'newPlayer':
+          players = players.set(message.data.player.name, Immutable.fromJS(message.data.player));
+          break;
+      }
+    });
+
+
+
+    accumulatedMessages = List();
+    return {
+      players: players,
+      ball: ball
+    };
   }
 
 };
