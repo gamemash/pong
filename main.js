@@ -11,6 +11,7 @@ let Time = require('./src/time.js');
 let Ball = require('./src/ball.js');
 let Vector = require('./src/vector.js');
 let Server = require('./src/server.js');
+let Collisions = require('./src/collisions.js');
 
 let canvas = document.getElementById('game-canvas');
 let errorHandler = function(){
@@ -75,7 +76,7 @@ function displayLoop(){
 
   let keyActions = KeyBindings.getActions();
   if (keyActions.size > 0){
-    Server.sendActions(keyActions.toJS());
+    Server.doCommand('sendActions', keyActions.toJS());
     keyActions.forEach(function(action){
       let id = action.get('subject')
       let player = players.get(id);
@@ -90,7 +91,13 @@ function displayLoop(){
   
   players = players.map(function(player)  {return Player.update(player, dt) } );
   ball = Ball.update(ball, players, dt);
-  ball = Ball.checkCollisionsWithPlayers(ball, players);
+  //ball = Ball.checkCollisionsWithPlayers(ball, players);
+  players.filter(function(player){
+    return Collisions.detect(ball, player);
+  }).forEach(function(player){
+    ball = Ball.resolveCollisionWithPlayer(ball, player);
+    Server.doCommand('ballHit', ball.toJS());
+  });
   ball = Ball.checkCollisionsWithWalls(ball, gameAspects);
   ball = checkLoseCondition(ball, players, gameAspects);
 

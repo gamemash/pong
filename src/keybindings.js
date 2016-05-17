@@ -30,7 +30,6 @@ module.exports = {
     document.addEventListener("keyup", keyEvent, false);
   },
   register: function(bindings, subject){
-    console.log(arguments);
     bindings.forEach(function(keyCode, action){
       registers = registerBinding(registers, keyCode, createAction(action, subject));
     });

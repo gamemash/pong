@@ -29,6 +29,9 @@ let commands = {
   },
   sendActions: function(actions){
     return {command: "sendActions", data: { actions: actions }};
+  },
+  ballHit: function(ball){
+    return {command: "ballHit", data: { ball: ball }};
   }
 };
 
@@ -61,8 +64,8 @@ let Server = {
       openPromises = openPromises.setIn(['connect', -1], resolve);
     });
   },
-  sendActions: function(actions){
-    sendMessage(commands.sendActions(actions));
+  doCommand: function(command, param){
+    sendMessage(commands[command](param));
   },
   connectToGame: function(gameid){
     return new Promise(function(resolve, error){
@@ -84,6 +87,9 @@ let Server = {
             });
             players = players.set(action.subject, Player.handleAction(player, act));
           });
+          break;
+        case 'ballHit':
+          ball = Immutable.fromJS(message.data.ball);
           break;
         default:
           console.log('Unhandled message', message.response);

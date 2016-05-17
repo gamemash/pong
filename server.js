@@ -40,6 +40,9 @@ let responses = {
   },
   newActions: function(actions){
     return {response: 'newActions', data: { actions: actions }}
+  },
+  ballHit: function(ball){
+    return {response: 'ballHit', data: { ball: ball }}
   }
   
 }
@@ -81,8 +84,17 @@ let commands = {
     otherPlayers.forEach(function(player){
       notifyClient(player.get('name'), message);
     });
+  },
+  ballHit: function(id, data){
+    let game = games.find(function(game) {
+      return game.get('players').find(findByPlayerId(id));
+    });
+    let otherPlayers = game.get('players').filterNot(findByPlayerId(id));
+    let message = responses.ballHit(data.ball);
+    otherPlayers.forEach(function(player){
+      notifyClient(player.get('name'), message);
+    });
   }
-
 }
 
 function handleMessage(ws, id, message){

@@ -14,28 +14,23 @@ module.exports = {
       })
     });
   },
-  checkCollisionsWithPlayers: function(ball, players){
-    players.forEach(function(player){
-      if(Collisions.detect(ball, player)){
-        let result = Vector.multiplyVector(Vector.create(-1, 0), ball.getIn(['properties','velocity']));
-        let distanceFromCenter = (player.getIn(['properties','position','y']) + player.getIn(['properties','size','y']) / 2) - (ball.getIn(['properties','position','y']) + ball.getIn(['properties','size','y']) / 2);
-        let angle = 0;
-        if (Math.abs(distanceFromCenter) > player.getIn(['properties','size','y']) / 4){
-          angle = Math.atan( -distanceFromCenter / player.getIn(['properties','size','y']));
-        }
+  resolveCollisionWithPlayer: function(ball, player){
+    let result = Vector.multiplyVector(Vector.create(-1, 0), ball.getIn(['properties','velocity']));
+    let distanceFromCenter = (player.getIn(['properties','position','y']) + player.getIn(['properties','size','y']) / 2) - (ball.getIn(['properties','position','y']) + ball.getIn(['properties','size','y']) / 2);
+    let angle = 0;
+    if (Math.abs(distanceFromCenter) > player.getIn(['properties','size','y']) / 4){
+      angle = Math.atan( -distanceFromCenter / player.getIn(['properties','size','y']));
+    }
 
-        if (ball.getIn(['properties', 'velocity', 'x']) > 0) {
-          result = Vector.rotateVector(result, -angle);
-          ball = ball.setIn(['properties', 'position', 'x'], player.getIn(['properties', 'position', 'x']) - ball.getIn(['properties', 'size', 'x']));
-        } else {
-          result = Vector.rotateVector(result, angle);
-          ball = ball.setIn(['properties', 'position', 'x'], player.getIn(['properties', 'position', 'x']) + player.getIn(['properties', 'size', 'x']));
-        }
+    if (ball.getIn(['properties', 'velocity', 'x']) > 0) {
+      result = Vector.rotateVector(result, -angle);
+      ball = ball.setIn(['properties', 'position', 'x'], player.getIn(['properties', 'position', 'x']) - ball.getIn(['properties', 'size', 'x']));
+    } else {
+      result = Vector.rotateVector(result, angle);
+      ball = ball.setIn(['properties', 'position', 'x'], player.getIn(['properties', 'position', 'x']) + player.getIn(['properties', 'size', 'x']));
+    }
 
-        ball = ball.setIn(['properties', 'velocity'], result);
-      }
-    });
-    return ball;
+    return ball.setIn(['properties', 'velocity'], result);
   },
   checkCollisionsWithWalls: function(ball, gameAspects){
     let result = Vector.create(0, 0);
